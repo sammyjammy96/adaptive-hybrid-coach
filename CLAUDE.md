@@ -50,7 +50,7 @@ Single global stylesheet at `src/styles.css` imported once by `main.tsx`. No CSS
 
 ## Hard constraints (do not violate)
 
-- **No API keys, tokens, or real credentials anywhere in the repo.** `scripts/check-no-secrets.mjs` blocks the patterns `sk-…`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `OCR_API_KEY`, `VITE_*_SECRET`, `VITE_*_API_KEY`. This runs in `verify` and CI — do not weaken the patterns to make a commit pass; remove the secret instead.
+- **No API keys, tokens, or real credentials anywhere in the repo.** `scripts/check-no-secrets.mjs` blocks well-known credential patterns (OpenAI-style `sk-…` keys plus several env-var-name shapes — see the `forbiddenPatterns` array in the script for the canonical list). This runs in `verify` and CI. **Important:** prose in `*.md` files that names those env vars literally will trigger the scanner too (the script ignores `docs/superpowers/` for this reason). Describe what is forbidden rather than spelling the env var names out, or extend the ignore list for new doc paths — never weaken the patterns to make a commit pass.
 - **No real private training data.** The README is explicit: future OCR, AI extraction, auth, and synced storage must run through a secure backend — this repo is the static frontend only.
 - **GitHub Pages base path.** `vite.config.ts` sets `base: './'` when `GITHUB_PAGES=true`, otherwise `'/'`. Don't hardcode absolute asset paths.
 - **`build` runs `tsc --noEmit` first.** Type errors fail the build; `noEmit: true` in `tsconfig.json` means TS never emits — Vite handles transpilation. Strict mode is on.
