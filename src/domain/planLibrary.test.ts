@@ -3,8 +3,8 @@ import { findTaggedBySlug, planLibrary } from './planLibrary';
 import type { PlanEmphasis, PlanLoad } from './planLibrary';
 
 describe('planLibrary', () => {
-  it('has at least 6 entries', () => {
-    expect(planLibrary.length).toBeGreaterThanOrEqual(6);
+  it('has at least 12 entries', () => {
+    expect(planLibrary.length).toBeGreaterThanOrEqual(12);
   });
 
   it('has at least one entry for every emphasis', () => {
