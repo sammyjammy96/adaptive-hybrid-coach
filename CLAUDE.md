@@ -48,6 +48,15 @@ The flow is: `loadAppState()` hydrates from localStorage → `useReducer` holds 
 
 The interactive-features work (wiring every prototype button to a real behavior) is mid-execution. Tasks 1–4 (state foundation) are complete; Tasks 5–11 (the UI wiring + final verification) remain. **Resume from [`docs/superpowers/plans/2026-05-20-interactive-features.md`](docs/superpowers/plans/2026-05-20-interactive-features.md)** — that file has the status table, the full code for each remaining task, and the underlying spec link.
 
+### Queued follow-up specs (do not implement until interactive-features is done)
+
+Two specs are designed and committed but explicitly gated on the interactive-features plan finishing first:
+
+- **[Smart Planner](docs/superpowers/specs/2026-05-20-smart-planner-design.md)** — replace the 3 hand-written plan variants with a ~20-entry tagged library + rule-based picker that selects based on recent logs, readiness, goal, and availability. Produces a human-readable rationale. Zero cost, no LLM, no backend.
+- **[OCR for Imports](docs/superpowers/specs/2026-05-20-ocr-imports-design.md)** — add Tesseract.js so the Upload Screenshot button performs real browser-side OCR, parsed into structured `ImportedWorkout` fields via regex heuristics. No backend, no API key.
+
+Both have implementation plans pending — write the plan only when ready to start. Each spec opens with an "Implementation gate" note pointing back at the interactive-features plan.
+
 ### Styling
 
 Single global stylesheet at `src/styles.css` imported once by `main.tsx`. No CSS modules, no CSS-in-JS. Icons come from `lucide-react`.
