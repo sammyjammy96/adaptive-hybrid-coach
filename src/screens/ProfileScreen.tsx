@@ -205,8 +205,8 @@ function shallowEqualProfile(a: AthleteProfile, b: AthleteProfile): boolean {
     a.runningBaseline === b.runningBaseline &&
     a.currentGoal === b.currentGoal &&
     a.preferredUnits === b.preferredUnits &&
-    a.prs === b.prs &&
-    a.injuryFlags === b.injuryFlags &&
-    a.weeklyAvailability === b.weeklyAvailability
+    JSON.stringify(a.prs) === JSON.stringify(b.prs) &&
+    JSON.stringify(a.injuryFlags) === JSON.stringify(b.injuryFlags) &&
+    JSON.stringify(a.weeklyAvailability) === JSON.stringify(b.weeklyAvailability)
   );
 }

@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 
 describe('App', () => {
@@ -153,7 +153,7 @@ describe('App', () => {
     expect(screen.getByText(/name is required/i)).toBeInTheDocument();
   });
 
-  it('adding a PR then removing it leaves no trace of the entry', async () => {
+  it('adding a PR then removing it returns the form to a clean state', async () => {
     const user = userEvent.setup();
     render(<App />);
 
@@ -174,5 +174,36 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /remove snatch double/i }));
 
     expect(screen.queryByText('Snatch double')).not.toBeInTheDocument();
+    expect(saveButton).toBeDisabled();
+  });
+
+  it('resetting prototype data brings the profile prompt back', async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    try {
+      render(<App />);
+
+      // Save a custom profile so the prompt hides.
+      await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+      const nameInput = screen.getByLabelText(/^name$/i) as HTMLInputElement;
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Sam');
+      await user.click(screen.getByRole('button', { name: /save profile/i }));
+
+      // Confirm the prompt is gone on Today.
+      await user.click(screen.getAllByRole('button', { name: /today/i })[0]);
+      expect(screen.queryByRole('region', { name: /profile prompt/i })).not.toBeInTheDocument();
+
+      // Reset.
+      await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+      await user.click(screen.getByRole('button', { name: /reset prototype data/i }));
+
+      // Back to Today, prompt should be visible again.
+      await user.click(screen.getAllByRole('button', { name: /today/i })[0]);
+      expect(screen.getByRole('region', { name: /profile prompt/i })).toBeInTheDocument();
+    } finally {
+      confirmSpy.mockRestore();
+    }
   });
 });

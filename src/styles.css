@@ -390,28 +390,6 @@ button {
   resize: vertical;
 }
 
-.profile-list {
-  display: grid;
-  gap: 0.6rem;
-}
-
-.profile-list span {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: #aab5c5;
-}
-
-.profile-list span:last-child {
-  border-bottom: 0;
-}
-
-.profile-list strong {
-  color: #ecf2ff;
-}
-
 .bottom-nav {
   position: fixed;
   right: 0.75rem;
