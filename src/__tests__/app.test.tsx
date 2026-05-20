@@ -3,6 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 
+vi.mock('../services/ocrImport', () => ({
+  extractTextFromImage: vi.fn().mockResolvedValue({
+    text: 'Wed: 5x3 back squat\nThen 10 min AMRAP wall balls, burpees',
+    confidence: 0.82
+  })
+}));
+
 describe('App', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -220,5 +227,31 @@ describe('App', () => {
     } finally {
       confirmSpy.mockRestore();
     }
+  });
+
+  it('uploading a screenshot OCRs the file and adds a parsed workout', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /import/i })[0]);
+
+    const fileInput = screen
+      .getByText(/upload screenshot/i)
+      .closest('label')
+      ?.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeTruthy();
+
+    const file = new File(['image-bytes'], 'shot.png', { type: 'image/png' });
+    await user.upload(fileInput, file);
+
+    // pickTitle: "Wed: 5x3 back squat" starts with 'W' (not a digit) so it is
+    // the first candidate — the parser returns it as the title.
+    const parsedCard = await screen.findByRole('heading', { name: /wed: 5x3 back squat/i });
+    expect(parsedCard).toBeInTheDocument();
+
+    const article = parsedCard.closest('article');
+    expect(article).not.toBeNull();
+    expect(within(article as HTMLElement).getByText(/wed pushpress/i)).toBeInTheDocument();
+    expect(within(article as HTMLElement).getByText(/82% confidence/i)).toBeInTheDocument();
   });
 });
