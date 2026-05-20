@@ -12,9 +12,21 @@ interface TodayScreenProps {
   recommendation: CoachRecommendation;
   onApplyEasyVersion: () => void;
   onRestore: (sessionId: string) => void;
+  showProfilePrompt: boolean;
+  onDismissProfilePrompt: () => void;
+  onNavigateToProfile: () => void;
 }
 
-export function TodayScreen({ plan, readiness, recommendation, onApplyEasyVersion, onRestore }: TodayScreenProps) {
+export function TodayScreen({
+  plan,
+  readiness,
+  recommendation,
+  onApplyEasyVersion,
+  onRestore,
+  showProfilePrompt: _showProfilePrompt,
+  onDismissProfilePrompt: _onDismissProfilePrompt,
+  onNavigateToProfile: _onNavigateToProfile
+}: TodayScreenProps) {
   const nextSession = plan.sessions.find(
     (session) => session.status === 'planned' || session.status === 'modified'
   ) as PlannedSession;

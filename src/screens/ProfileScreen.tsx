@@ -2,10 +2,11 @@ import type { AthleteProfile } from '../domain/types';
 
 interface ProfileScreenProps {
   profile: AthleteProfile;
+  onUpdate: (profile: AthleteProfile) => void;
   onReset: () => void;
 }
 
-export function ProfileScreen({ profile, onReset }: ProfileScreenProps) {
+export function ProfileScreen({ profile, onUpdate: _onUpdate, onReset }: ProfileScreenProps) {
   function handleReset() {
     const confirmed = window.confirm(
       'This clears all your saved logs, approvals, and plan changes. Continue?'

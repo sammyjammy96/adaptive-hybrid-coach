@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react';
 import { AppChrome, type ScreenKey } from './components/AppChrome';
 import { appReducer, initialAppState } from './domain/appState';
-import { demoProfile, demoReadiness, demoRecommendations } from './domain/demoData';
+import { demoReadiness, demoRecommendations } from './domain/demoData';
 import { protectRunsAfterHeavyLowerBody } from './domain/planning';
 import { ImportScreen } from './screens/ImportScreen';
 import { LogScreen } from './screens/LogScreen';
@@ -37,6 +37,9 @@ export default function App() {
             })
           }
           onRestore={(sessionId) => dispatch({ type: 'RESTORE_SESSION', sessionId })}
+          showProfilePrompt={!state.hasCustomizedProfile && !state.hasDismissedProfilePrompt}
+          onDismissProfilePrompt={() => dispatch({ type: 'DISMISS_PROFILE_PROMPT' })}
+          onNavigateToProfile={() => dispatch({ type: 'SET_ACTIVE_SCREEN', screen: 'profile' })}
         />
       ) : null}
       {state.activeScreen === 'plan' ? (
@@ -64,7 +67,8 @@ export default function App() {
       ) : null}
       {state.activeScreen === 'profile' ? (
         <ProfileScreen
-          profile={demoProfile}
+          profile={state.profile}
+          onUpdate={(profile) => dispatch({ type: 'UPDATE_PROFILE', profile })}
           onReset={() => dispatch({ type: 'RESET_TO_DEMO' })}
         />
       ) : null}
