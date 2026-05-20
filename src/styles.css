@@ -560,3 +560,53 @@ button {
   gap: 0.45rem;
   cursor: pointer;
 }
+
+.log-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.saved-flag {
+  color: #7ee0b2;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.saved-flag.is-visible {
+  opacity: 1;
+}
+
+.recent-logs {
+  margin-top: 1rem;
+}
+
+.recent-logs ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-logs li {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #aab5c5;
+}
+
+.recent-logs li:last-child {
+  border-bottom: 0;
+}
+
+.recent-logs strong {
+  color: #ecf2ff;
+}
+
+.recent-logs__empty {
+  margin: 0.4rem 0 0;
+  color: #aab5c5;
+}

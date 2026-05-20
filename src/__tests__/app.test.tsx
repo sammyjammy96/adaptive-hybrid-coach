@@ -65,4 +65,27 @@ describe('App', () => {
     expect(screen.queryByText(/easier: crossfit class/i)).not.toBeInTheDocument();
     expect(screen.getAllByText(/crossfit class/i).length).toBeGreaterThan(0);
   });
+
+  it('saves a log entry and shows it in the Recent logs panel', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /^log$/i })[0]);
+
+    const sessionSelect = screen.getByLabelText(/which session/i);
+    await user.selectOptions(sessionSelect, 'mon-cf');
+
+    const durationInput = screen.getByLabelText(/duration/i) as HTMLInputElement;
+    await user.clear(durationInput);
+    await user.type(durationInput, '62');
+
+    const notes = screen.getByLabelText(/notes/i);
+    await user.type(notes, 'felt strong');
+
+    await user.click(screen.getByRole('button', { name: /save log/i }));
+
+    expect(screen.getByText(/saved/i)).toBeInTheDocument();
+    const recentLogs = screen.getByRole('region', { name: /recent logs/i });
+    expect(within(recentLogs).getByText(/felt strong/i)).toBeInTheDocument();
+  });
 });

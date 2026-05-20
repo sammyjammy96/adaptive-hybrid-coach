@@ -55,7 +55,13 @@ export default function App() {
           onUpload={(fileName) => dispatch({ type: 'ADD_UPLOADED_WORKOUT', fileName })}
         />
       ) : null}
-      {state.activeScreen === 'log' ? <LogScreen plan={protectedPlan} logs={state.logs} /> : null}
+      {state.activeScreen === 'log' ? (
+        <LogScreen
+          plan={protectedPlan}
+          logs={state.logs}
+          onSaveLog={(log) => dispatch({ type: 'SAVE_LOG', log })}
+        />
+      ) : null}
       {state.activeScreen === 'profile' ? <ProfileScreen profile={demoProfile} /> : null}
     </AppChrome>
   );
