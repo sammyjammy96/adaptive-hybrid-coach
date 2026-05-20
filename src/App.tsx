@@ -62,7 +62,12 @@ export default function App() {
           onSaveLog={(log) => dispatch({ type: 'SAVE_LOG', log })}
         />
       ) : null}
-      {state.activeScreen === 'profile' ? <ProfileScreen profile={demoProfile} /> : null}
+      {state.activeScreen === 'profile' ? (
+        <ProfileScreen
+          profile={demoProfile}
+          onReset={() => dispatch({ type: 'RESET_TO_DEMO' })}
+        />
+      ) : null}
     </AppChrome>
   );
 }

@@ -2,9 +2,19 @@ import type { AthleteProfile } from '../domain/types';
 
 interface ProfileScreenProps {
   profile: AthleteProfile;
+  onReset: () => void;
 }
 
-export function ProfileScreen({ profile }: ProfileScreenProps) {
+export function ProfileScreen({ profile, onReset }: ProfileScreenProps) {
+  function handleReset() {
+    const confirmed = window.confirm(
+      'This clears all your saved logs, approvals, and plan changes. Continue?'
+    );
+    if (confirmed) {
+      onReset();
+    }
+  }
+
   return (
     <div>
       <header className="screen-header">
@@ -45,6 +55,11 @@ export function ProfileScreen({ profile }: ProfileScreenProps) {
           <h2>Privacy mode</h2>
           <p>Prototype data stays in this browser. AI extraction and account sync require a secure backend later.</p>
         </section>
+      </div>
+      <div className="reset-row">
+        <button type="button" className="destructive-action" onClick={handleReset}>
+          Reset prototype data
+        </button>
       </div>
     </div>
   );
