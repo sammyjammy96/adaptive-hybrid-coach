@@ -12,6 +12,30 @@
 
 ---
 
+## Execution Status
+
+**Last updated:** 2026-05-20
+
+Tasks 1–4 are complete on `master`. Tasks 5–11 remain. The reducer, persistence layer, and App.tsx wiring are all in place — what's left is wiring each UI button to its action.
+
+| # | Task | Status | Commits |
+|---|------|--------|---------|
+| 1 | Plan templates, helpers, AppState types | ✅ Done | `4cde55b`, `dfd13fb` |
+| 2 | Reducer (action vocabulary) | ✅ Done | `d28ca74`, `2a9910b` |
+| 3 | Persistence layer | ✅ Done | `bb35b08`, `073f684` |
+| 4 | Wire App.tsx to reducer + persistence | ✅ Done | `11a58d1` |
+| 5 | Approve / Needs review buttons | ⬜ Pending | — |
+| 6 | Apply easy version + Restore link | ⬜ Pending | — |
+| 7 | Regenerate week button | ⬜ Pending | — |
+| 8 | Upload screenshot | ⬜ Pending | — |
+| 9 | Save log (form + recent logs panel) | ⬜ Pending | — |
+| 10 | Reset prototype data | ⬜ Pending | — |
+| 11 | Final verification | ⬜ Pending | — |
+
+**To resume:** read [the spec](../specs/2026-05-20-interactive-features-design.md), then start at **Task 5** below. Each task has full code blocks and exact commands — the implementer needs no other context. The reviewer feedback from Tasks 1–4 surfaced some minor improvements not in the original plan (the `applyEasier` reference-stability guard, the `isValidShape` persistence sanity check, the `_exhaustive` `throw`, exported persistence key constants) — those are already in the codebase, so subsequent tasks build on them without needing replication.
+
+---
+
 ## Working Directory & Run Convention
 
 All commands run from `C:\Users\kai_b\OneDrive\Documents\Training App` (or its equivalent on a Linux/macOS machine). Local binaries are invoked through `node` because the user's global `npm` shim is broken; equivalents:

@@ -33,16 +33,20 @@ Vitest config lives inside `vite.config.ts` (jsdom env, globals on, setup file `
 
 ### Shell + screens
 
-`src/main.tsx` mounts `<App />`. `src/App.tsx` is the single source of routing: it holds a `ScreenKey` state (`'today' | 'plan' | 'import' | 'log' | 'profile'`), persists it via `services/localStore`, and conditionally renders one of five screen components inside `components/AppChrome`. `AppChrome` renders both a side nav (desktop) and a bottom nav (mobile) from the same `navItems` list. There is no router library — adding a screen means: extend `ScreenKey`, add to `navItems`, add a branch in `App.tsx`, add the screen file under `src/screens/`.
+`src/main.tsx` mounts `<App />`. `src/App.tsx` owns a single `useReducer(appReducer, undefined, loadAppState)` that drives every screen. The reducer lives in `src/domain/appState.ts` (pure, no side effects); persistence is in `src/services/appPersistence.ts` (writes to localStorage on every dispatch via a `useEffect`). Routing is just a `state.activeScreen` check that picks one of five screen components inside `components/AppChrome`. `AppChrome` renders both a side nav (desktop) and a bottom nav (mobile) from the same `navItems` list. There is no router library — adding a screen means: extend `ScreenKey` in `domain/appState.ts`, add to `navItems` in `AppChrome.tsx`, add a branch in `App.tsx`, add the screen file under `src/screens/`.
 
 ### Layered structure
 
-- **`src/domain/`** — pure TS, no React. `types.ts` is the canonical schema for every entity (`AthleteProfile`, `WeeklyPlan`, `PlannedSession`, `ImportedWorkout`, `ReadinessCheckIn`, `CoachRecommendation`, etc.). `planning.ts` holds the business logic (readiness score, run protection after heavy lower-body CrossFit, weekly balance, coach recommendations). `demoData.ts` exports the fixtures the UI runs on. **All planning logic is pure and unit-tested in `planning.test.ts`** — keep new rules pure and add tests there.
-- **`src/screens/`** — one component per top-level screen. Receive their data as props from `App.tsx`; do not fetch.
+- **`src/domain/`** — pure TS, no React. `types.ts` is the canonical schema for every entity (`AthleteProfile`, `WeeklyPlan`, `PlannedSession`, `ImportedWorkout`, `ReadinessCheckIn`, `CoachRecommendation`, etc.). `planning.ts` holds the readiness / weekly-balance / run-protection logic and the canonical `dayOrder` constant. `appState.ts` defines `AppState`, the `AppAction` union, `appReducer`, and helpers (`findNextHardPlannedSession`, `nextEmptyDay`). `planTemplates.ts` holds three `WeeklyPlan` variants for the Regenerate Week feature. `demoData.ts` exports the initial fixtures. **All planning + reducer logic is pure and unit-tested next to the source** — keep new rules pure and add tests there.
+- **`src/screens/`** — one component per top-level screen. Receive their data and dispatch callbacks as props from `App.tsx`; do not fetch.
 - **`src/components/`** — shared presentational pieces (`AppChrome`, `CoachCard`, `LoadBalance`, `MetricRing`, `SessionCard`).
-- **`src/services/`** — browser-only side effects. Currently just `localStore.ts` (typed `loadLocalValue` / `saveLocalValue` with try/catch fallbacks). New side-effectful code (storage, future fetch) belongs here, not in screens.
+- **`src/services/`** — browser-only side effects. `localStore.ts` is the typed try/catch wrapper around `window.localStorage`. `appPersistence.ts` layers on top: schema versioning (`hybrid-coach-state-v1`), one-shot migration from the legacy `hybrid-coach-active-screen` key, and `isValidShape` sanity check before trusting a stored payload.
 
-The flow is: `demoData` → `App.tsx` applies domain transforms (e.g. `protectRunsAfterHeavyLowerBody`) → resulting view models passed as props into screens. Persisted state goes through `services/localStore` keyed by string (e.g. `'hybrid-coach-active-screen'`).
+The flow is: `loadAppState()` hydrates from localStorage → `useReducer` holds the state → `App.tsx` derives `protectedPlan` via `protectRunsAfterHeavyLowerBody(state.plan, state.workouts)` → screens get state slices + typed dispatch callbacks. Every dispatch persists via the `useEffect`.
+
+### In-progress work
+
+The interactive-features work (wiring every prototype button to a real behavior) is mid-execution. Tasks 1–4 (state foundation) are complete; Tasks 5–11 (the UI wiring + final verification) remain. **Resume from [`docs/superpowers/plans/2026-05-20-interactive-features.md`](docs/superpowers/plans/2026-05-20-interactive-features.md)** — that file has the status table, the full code for each remaining task, and the underlying spec link.
 
 ### Styling
 
@@ -68,4 +72,4 @@ When the user asks for "handoff", "checkpoint", "fresh context", or "continue in
 
 ## Deploy
 
-`.github/workflows/deploy-pages.yml` builds with `GITHUB_PAGES=true` and publishes to GitHub Pages. Pages must be enabled for GitHub Actions in repo settings (one-time, manual).
+`.github/workflows/deploy-pages.yml` builds with `GITHUB_PAGES=true` and publishes to GitHub Pages on every push to `master`. The live URL is **https://sammyjammy96.github.io/adaptive-hybrid-coach/**. Pages is enabled for GitHub Actions in repo settings (already configured — no further setup needed).
