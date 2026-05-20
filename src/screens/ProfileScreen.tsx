@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { AthleteProfile } from '../domain/types';
 import { AvailabilityEditor } from '../components/AvailabilityEditor';
+import { InjuryFlagEditor } from '../components/InjuryFlagEditor';
 import { PrEditor } from '../components/PrEditor';
 
 interface ProfileScreenProps {
@@ -161,7 +162,10 @@ export function ProfileScreen({ profile, hasCustomizedProfile, onUpdate, onReset
           value={draft.prs}
           onChange={(next) => updateField('prs', next)}
         />
-        {/* Injury flag editor is added in Task 8. */}
+        <InjuryFlagEditor
+          value={draft.injuryFlags}
+          onChange={(next) => updateField('injuryFlags', next)}
+        />
 
         <div className="log-actions">
           <button

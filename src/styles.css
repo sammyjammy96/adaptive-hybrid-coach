@@ -904,3 +904,16 @@ button {
   width: 1.05rem;
   height: 1.05rem;
 }
+
+.flag-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.flag-text {
+  color: #ecf2ff;
+}
+
+.flag-add {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
