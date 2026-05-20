@@ -26,9 +26,25 @@ export default function App() {
   return (
     <AppChrome activeScreen={state.activeScreen} onNavigate={navigate}>
       {state.activeScreen === 'today' ? (
-        <TodayScreen plan={protectedPlan} readiness={demoReadiness} recommendation={demoRecommendations[0]} />
+        <TodayScreen
+          plan={protectedPlan}
+          readiness={demoReadiness}
+          recommendation={demoRecommendations[0]}
+          onApplyEasyVersion={() =>
+            dispatch({
+              type: 'APPLY_EASY_VERSION',
+              flavor: demoRecommendations[0].id === 'pain-flag' ? 'recovery' : 'easier'
+            })
+          }
+          onRestore={(sessionId) => dispatch({ type: 'RESTORE_SESSION', sessionId })}
+        />
       ) : null}
-      {state.activeScreen === 'plan' ? <PlanScreen plan={protectedPlan} /> : null}
+      {state.activeScreen === 'plan' ? (
+        <PlanScreen
+          plan={protectedPlan}
+          onRestore={(sessionId) => dispatch({ type: 'RESTORE_SESSION', sessionId })}
+        />
+      ) : null}
       {state.activeScreen === 'import' ? (
         <ImportScreen
           workouts={state.workouts}

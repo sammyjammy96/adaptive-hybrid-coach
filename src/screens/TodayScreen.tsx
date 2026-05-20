@@ -2,6 +2,7 @@ import { CoachCard } from '../components/CoachCard';
 import { LoadBalance } from '../components/LoadBalance';
 import { MetricRing } from '../components/MetricRing';
 import { SessionCard } from '../components/SessionCard';
+import { findNextHardPlannedSession } from '../domain/appState';
 import { calculateReadinessScore, getWeeklyBalance } from '../domain/planning';
 import type { CoachRecommendation, PlannedSession, ReadinessCheckIn, WeeklyPlan } from '../domain/types';
 
@@ -9,12 +10,17 @@ interface TodayScreenProps {
   plan: WeeklyPlan;
   readiness: ReadinessCheckIn;
   recommendation: CoachRecommendation;
+  onApplyEasyVersion: () => void;
+  onRestore: (sessionId: string) => void;
 }
 
-export function TodayScreen({ plan, readiness, recommendation }: TodayScreenProps) {
-  const nextSession = plan.sessions.find((session) => session.status === 'planned') as PlannedSession;
+export function TodayScreen({ plan, readiness, recommendation, onApplyEasyVersion, onRestore }: TodayScreenProps) {
+  const nextSession = plan.sessions.find(
+    (session) => session.status === 'planned' || session.status === 'modified'
+  ) as PlannedSession;
   const readinessScore = calculateReadinessScore(readiness);
   const balance = getWeeklyBalance(plan);
+  const canApplyEasy = findNextHardPlannedSession(plan) !== undefined;
 
   return (
     <div>
@@ -27,8 +33,12 @@ export function TodayScreen({ plan, readiness, recommendation }: TodayScreenProp
       </header>
       <div className="grid two">
         <div className="grid">
-          <CoachCard recommendation={recommendation} />
-          <SessionCard session={nextSession} />
+          <CoachCard
+            recommendation={recommendation}
+            onAction={onApplyEasyVersion}
+            disabled={!canApplyEasy}
+          />
+          <SessionCard session={nextSession} onRestore={onRestore} />
         </div>
         <LoadBalance
           crossfitSessions={balance.crossfitSessions}

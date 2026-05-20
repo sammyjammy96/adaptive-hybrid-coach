@@ -3,9 +3,11 @@ import type { PlannedSession } from '../domain/types';
 
 interface SessionCardProps {
   session: PlannedSession;
+  onRestore?: (sessionId: string) => void;
 }
 
-export function SessionCard({ session }: SessionCardProps) {
+export function SessionCard({ session, onRestore }: SessionCardProps) {
+  const isModified = session.status === 'modified';
   return (
     <article className={`session-card ${session.type}`}>
       <div className="session-card__header">
@@ -28,6 +30,11 @@ export function SessionCard({ session }: SessionCardProps) {
           <AlertTriangle aria-hidden="true" />
           <span>{session.warning}</span>
         </div>
+      ) : null}
+      {isModified && onRestore ? (
+        <button type="button" className="restore-link" onClick={() => onRestore(session.id)}>
+          Restore
+        </button>
       ) : null}
     </article>
   );

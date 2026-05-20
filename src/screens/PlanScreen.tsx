@@ -3,9 +3,10 @@ import type { WeeklyPlan } from '../domain/types';
 
 interface PlanScreenProps {
   plan: WeeklyPlan;
+  onRestore: (sessionId: string) => void;
 }
 
-export function PlanScreen({ plan }: PlanScreenProps) {
+export function PlanScreen({ plan, onRestore }: PlanScreenProps) {
   return (
     <div>
       <header className="screen-header">
@@ -19,7 +20,7 @@ export function PlanScreen({ plan }: PlanScreenProps) {
       </header>
       <div className="grid three">
         {plan.sessions.map((session) => (
-          <SessionCard key={session.id} session={session} />
+          <SessionCard key={session.id} session={session} onRestore={onRestore} />
         ))}
       </div>
     </div>

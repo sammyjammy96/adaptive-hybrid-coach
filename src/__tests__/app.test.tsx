@@ -49,4 +49,20 @@ describe('App', () => {
 
     expect(approveButton).toHaveAttribute('aria-pressed', 'true');
   });
+
+  it('applies an easier version of the next hard session and lets the user restore it', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(screen.getByText(/crossfit class/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /apply easy version/i }));
+
+    expect(screen.getByText(/easier: crossfit class/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /restore/i }));
+
+    expect(screen.queryByText(/easier: crossfit class/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/crossfit class/i).length).toBeGreaterThan(0);
+  });
 });

@@ -501,3 +501,19 @@ button {
   color: #2a1300;
   background: #ffd27a;
 }
+
+.restore-link {
+  margin-top: 0.6rem;
+  padding: 0;
+  border: 0;
+  color: #7ee0b2;
+  background: transparent;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.primary-action:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  opacity: 0.55;
+}
