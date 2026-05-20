@@ -116,4 +116,40 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: /training context/i })).toBeInTheDocument();
   });
+
+  it('saves profile edits and hides the profile prompt afterwards', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+
+    const nameInput = screen.getByLabelText(/^name$/i) as HTMLInputElement;
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Sam');
+
+    await user.click(screen.getByRole('button', { name: /save profile/i }));
+
+    expect(screen.getByText(/saved/i)).toBeInTheDocument();
+
+    await user.click(screen.getAllByRole('button', { name: /today/i })[0]);
+
+    expect(screen.queryByRole('region', { name: /profile prompt/i })).not.toBeInTheDocument();
+  });
+
+  it('blocks save when name is empty', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+
+    const nameInput = screen.getByLabelText(/^name$/i) as HTMLInputElement;
+    await user.clear(nameInput);
+
+    const saveButton = screen.getByRole('button', { name: /save profile/i });
+    expect(saveButton).not.toBeDisabled();
+
+    await user.click(saveButton);
+
+    expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+  });
 });

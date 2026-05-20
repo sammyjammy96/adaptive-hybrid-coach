@@ -68,6 +68,7 @@ export default function App() {
       {state.activeScreen === 'profile' ? (
         <ProfileScreen
           profile={state.profile}
+          hasCustomizedProfile={state.hasCustomizedProfile}
           onUpdate={(profile) => dispatch({ type: 'UPDATE_PROFILE', profile })}
           onReset={() => dispatch({ type: 'RESET_TO_DEMO' })}
         />
