@@ -2,6 +2,7 @@ import { demoImportedWorkouts, demoProfile } from './demoData';
 import { dayOrder } from './planning';
 import { findTaggedBySlug, planLibrary, type PlanTags } from './planLibrary';
 import { pickPlan } from './planPicker';
+import type { ParsedWorkout } from './workoutParser';
 import type {
   AthleteProfile,
   AvailabilityWindow,
@@ -60,7 +61,7 @@ export type AppAction =
   | { type: 'APPLY_EASY_VERSION'; flavor: 'easier' | 'recovery' }
   | { type: 'RESTORE_SESSION'; sessionId: string }
   | { type: 'PICK_NEW_PLAN'; readiness: ReadinessCheckIn; availability: AvailabilityWindow[]; goal: string }
-  | { type: 'ADD_UPLOADED_WORKOUT'; fileName: string }
+  | { type: 'ADD_UPLOADED_WORKOUT'; fileName: string; parsed?: ParsedWorkout }
   | { type: 'SAVE_LOG'; log: TrainingLog }
   | { type: 'UPDATE_PROFILE'; profile: AthleteProfile }
   | { type: 'DISMISS_PROFILE_PROMPT' }
@@ -166,21 +167,35 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'ADD_UPLOADED_WORKOUT': {
-      const day = nextEmptyDay(state.workouts);
-      const workout: ImportedWorkout = {
-        id: uploadedWorkoutId(),
-        day,
-        source: 'pushpress-screenshot',
-        title: `Uploaded: ${action.fileName}`,
-        extractedText:
-          'Uploaded image processed in prototype mode. Real OCR runs through a future backend.',
-        confidence: 0.65,
-        reviewState: 'needs-review',
-        lowerBodyLoad: 'moderate',
-        metconIntensity: 'moderate',
-        fatigueImpact: 'moderate',
-        tags: [{ label: 'imported', level: 'moderate' }]
-      };
+      const day = action.parsed?.day ?? nextEmptyDay(state.workouts);
+      const workout: ImportedWorkout = action.parsed
+        ? {
+            id: uploadedWorkoutId(),
+            day,
+            source: 'pushpress-screenshot',
+            title: action.parsed.title,
+            extractedText: action.parsed.extractedText,
+            confidence: action.parsed.confidence,
+            reviewState: 'needs-review',
+            lowerBodyLoad: action.parsed.lowerBodyLoad,
+            metconIntensity: action.parsed.metconIntensity,
+            fatigueImpact: action.parsed.fatigueImpact,
+            tags: action.parsed.tags
+          }
+        : {
+            id: uploadedWorkoutId(),
+            day,
+            source: 'pushpress-screenshot',
+            title: `Uploaded: ${action.fileName}`,
+            extractedText:
+              'Uploaded image processed in prototype mode. Real OCR runs through a future backend.',
+            confidence: 0.65,
+            reviewState: 'needs-review',
+            lowerBodyLoad: 'moderate',
+            metconIntensity: 'moderate',
+            fatigueImpact: 'moderate',
+            tags: [{ label: 'imported', level: 'moderate' }]
+          };
       return { ...state, workouts: [...state.workouts, workout] };
     }
 

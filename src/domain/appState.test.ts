@@ -219,4 +219,42 @@ describe('appReducer', () => {
     expect(reset.hasCustomizedProfile).toBe(false);
     expect(reset.hasDismissedProfilePrompt).toBe(false);
   });
+
+  it('ADD_UPLOADED_WORKOUT with parsed fields uses them', () => {
+    const next = appReducer(initialAppState, {
+      type: 'ADD_UPLOADED_WORKOUT',
+      fileName: 'shot.png',
+      parsed: {
+        day: 'Wed',
+        title: '5x3 back squat',
+        extractedText: 'Back squat then short metcon',
+        confidence: 0.82,
+        lowerBodyLoad: 'high',
+        metconIntensity: 'moderate',
+        fatigueImpact: 'high',
+        tags: [
+          { label: 'lower body', level: 'high' },
+          { label: 'metcon', level: 'moderate' }
+        ]
+      }
+    });
+    const added = next.workouts[next.workouts.length - 1];
+    expect(added.day).toBe('Wed');
+    expect(added.title).toBe('5x3 back squat');
+    expect(added.extractedText).toBe('Back squat then short metcon');
+    expect(added.confidence).toBeCloseTo(0.82, 5);
+    expect(added.lowerBodyLoad).toBe('high');
+    expect(added.metconIntensity).toBe('moderate');
+    expect(added.fatigueImpact).toBe('high');
+    expect(added.tags.length).toBe(2);
+    expect(added.reviewState).toBe('needs-review');
+  });
+
+  it('ADD_UPLOADED_WORKOUT without parsed still creates a canned workout (fallback path)', () => {
+    const next = appReducer(initialAppState, { type: 'ADD_UPLOADED_WORKOUT', fileName: 'shot.png' });
+    const added = next.workouts[next.workouts.length - 1];
+    expect(added.title).toBe('Uploaded: shot.png');
+    expect(added.reviewState).toBe('needs-review');
+    expect(added.confidence).toBeCloseTo(0.65, 5);
+  });
 });
