@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { demoImportedWorkouts, demoWeeklyPlan } from './demoData';
-import { findNextHardPlannedSession, initialAppState, nextEmptyDay } from './appState';
+import { appReducer, findNextHardPlannedSession, initialAppState, nextEmptyDay } from './appState';
 import { planTemplates } from './planTemplates';
-import type { PlannedSession } from './types';
+import type { PlannedSession, TrainingLog } from './types';
 
 describe('findNextHardPlannedSession', () => {
   it('returns the first planned session whose intensity is high', () => {
@@ -68,5 +68,108 @@ describe('initialAppState', () => {
     expect(initialAppState.logs).toEqual([]);
     expect(initialAppState.planVariantIndex).toBe(0);
     expect(initialAppState.schemaVersion).toBe(1);
+  });
+});
+
+describe('appReducer', () => {
+  it('SET_ACTIVE_SCREEN updates activeScreen', () => {
+    const next = appReducer(initialAppState, { type: 'SET_ACTIVE_SCREEN', screen: 'plan' });
+    expect(next.activeScreen).toBe('plan');
+  });
+
+  it('APPROVE_WORKOUT flips reviewState to approved', () => {
+    const next = appReducer(initialAppState, { type: 'APPROVE_WORKOUT', id: 'cf-wed' });
+    expect(next.workouts.find((w) => w.id === 'cf-wed')?.reviewState).toBe('approved');
+  });
+
+  it('APPROVE_WORKOUT is a no-op for an unknown id', () => {
+    const next = appReducer(initialAppState, { type: 'APPROVE_WORKOUT', id: 'does-not-exist' });
+    expect(next.workouts).toEqual(initialAppState.workouts);
+  });
+
+  it('REJECT_WORKOUT sets reviewState back to needs-review', () => {
+    const next = appReducer(initialAppState, { type: 'REJECT_WORKOUT', id: 'cf-mon' });
+    expect(next.workouts.find((w) => w.id === 'cf-mon')?.reviewState).toBe('needs-review');
+  });
+
+  it('APPLY_EASY_VERSION easier flavor lowers intensity and marks session as modified', () => {
+    const next = appReducer(initialAppState, { type: 'APPLY_EASY_VERSION', flavor: 'easier' });
+    const monday = next.plan.sessions.find((s) => s.id === 'mon-cf');
+    expect(monday?.intensity).toBe('low');
+    expect(monday?.status).toBe('modified');
+    expect(monday?.title.startsWith('Easier: ')).toBe(true);
+  });
+
+  it('APPLY_EASY_VERSION recovery flavor swaps the session to a recovery type', () => {
+    const next = appReducer(initialAppState, { type: 'APPLY_EASY_VERSION', flavor: 'recovery' });
+    const monday = next.plan.sessions.find((s) => s.id === 'mon-cf');
+    expect(monday?.type).toBe('recovery');
+    expect(monday?.intensity).toBe('low');
+    expect(monday?.status).toBe('modified');
+    expect(monday?.title).toBe('Recovery session');
+  });
+
+  it('APPLY_EASY_VERSION is a no-op when no eligible session exists', () => {
+    const plan = {
+      ...initialAppState.plan,
+      sessions: initialAppState.plan.sessions.map((s) => ({ ...s, intensity: 'low' as const }))
+    };
+    const state = { ...initialAppState, plan };
+    const next = appReducer(state, { type: 'APPLY_EASY_VERSION', flavor: 'easier' });
+    expect(next.plan).toEqual(plan);
+  });
+
+  it('RESTORE_SESSION reverts a modified session to the variant template version', () => {
+    const modified = appReducer(initialAppState, { type: 'APPLY_EASY_VERSION', flavor: 'easier' });
+    const restored = appReducer(modified, { type: 'RESTORE_SESSION', sessionId: 'mon-cf' });
+    const monday = restored.plan.sessions.find((s) => s.id === 'mon-cf');
+    const original = initialAppState.plan.sessions.find((s) => s.id === 'mon-cf');
+    expect(monday).toEqual(original);
+  });
+
+  it('RESTORE_SESSION is a no-op for an unknown session id', () => {
+    const next = appReducer(initialAppState, { type: 'RESTORE_SESSION', sessionId: 'no-such-id' });
+    expect(next.plan).toEqual(initialAppState.plan);
+  });
+
+  it('REGENERATE_WEEK cycles to the next variant', () => {
+    const next = appReducer(initialAppState, { type: 'REGENERATE_WEEK' });
+    expect(next.planVariantIndex).toBe(1);
+    expect(next.plan.sessions[0].id).toBe('mon-cf');
+  });
+
+  it('REGENERATE_WEEK wraps from variant 2 back to 0', () => {
+    const state = { ...initialAppState, planVariantIndex: 2 as const };
+    const next = appReducer(state, { type: 'REGENERATE_WEEK' });
+    expect(next.planVariantIndex).toBe(0);
+  });
+
+  it('ADD_UPLOADED_WORKOUT appends an imported workout with expected fields', () => {
+    const next = appReducer(initialAppState, { type: 'ADD_UPLOADED_WORKOUT', fileName: 'screenshot.png' });
+    expect(next.workouts.length).toBe(initialAppState.workouts.length + 1);
+    const added = next.workouts[next.workouts.length - 1];
+    expect(added.source).toBe('pushpress-screenshot');
+    expect(added.reviewState).toBe('needs-review');
+    expect(added.title).toBe('Uploaded: screenshot.png');
+    expect(added.id.startsWith('uploaded-')).toBe(true);
+  });
+
+  it('SAVE_LOG appends to logs array', () => {
+    const log: TrainingLog = {
+      sessionId: 'mon-cf',
+      completion: 'completed',
+      rpe: 7,
+      durationMinutes: 60,
+      notes: 'felt good'
+    };
+    const next = appReducer(initialAppState, { type: 'SAVE_LOG', log });
+    expect(next.logs).toEqual([log]);
+  });
+
+  it('RESET_TO_DEMO returns initial state', () => {
+    const log: TrainingLog = { sessionId: 'mon-cf', completion: 'completed', rpe: 7, durationMinutes: 60, notes: '' };
+    const dirty = appReducer(initialAppState, { type: 'SAVE_LOG', log });
+    const reset = appReducer(dirty, { type: 'RESET_TO_DEMO' });
+    expect(reset).toEqual(initialAppState);
   });
 });
