@@ -50,12 +50,13 @@ The interactive-features work (wiring every prototype button to a real behavior)
 
 ### Queued follow-up specs (do not implement until interactive-features is done)
 
-Two specs are designed and committed but explicitly gated on the interactive-features plan finishing first:
+Three specs are designed and committed but explicitly gated on the interactive-features plan finishing first. Suggested ship order: **Profile Setup → Smart Planner → OCR for Imports** (Profile data feeds the Smart Planner; OCR is independent).
 
-- **[Smart Planner](docs/superpowers/specs/2026-05-20-smart-planner-design.md)** — replace the 3 hand-written plan variants with a ~20-entry tagged library + rule-based picker that selects based on recent logs, readiness, goal, and availability. Produces a human-readable rationale. Zero cost, no LLM, no backend.
+- **[Profile Setup & Editing](docs/superpowers/specs/2026-05-20-profile-setup-design.md)** — move `AthleteProfile` into `AppState`, add a soft first-launch prompt on Today, make the Profile screen fully editable (name, age, goal, availability per day, PRs add/remove, injury flags add/remove, units). Additive persistence, no schema bump.
+- **[Smart Planner](docs/superpowers/specs/2026-05-20-smart-planner-design.md)** — replace the 3 hand-written plan variants with a ~20-entry tagged library + rule-based picker that selects based on recent logs, readiness, goal, and availability. Produces a human-readable rationale. Zero cost, no LLM, no backend. Schema bumps to v2.
 - **[OCR for Imports](docs/superpowers/specs/2026-05-20-ocr-imports-design.md)** — add Tesseract.js so the Upload Screenshot button performs real browser-side OCR, parsed into structured `ImportedWorkout` fields via regex heuristics. No backend, no API key.
 
-Both have implementation plans pending — write the plan only when ready to start. Each spec opens with an "Implementation gate" note pointing back at the interactive-features plan.
+Each spec opens with an "Implementation gate" note pointing back at the interactive-features plan. Plans (task-by-task breakdowns) are written when implementation starts, not before.
 
 ### Styling
 
