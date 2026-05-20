@@ -1,3 +1,4 @@
+import { Sparkles, X } from 'lucide-react';
 import { CoachCard } from '../components/CoachCard';
 import { LoadBalance } from '../components/LoadBalance';
 import { MetricRing } from '../components/MetricRing';
@@ -23,9 +24,9 @@ export function TodayScreen({
   recommendation,
   onApplyEasyVersion,
   onRestore,
-  showProfilePrompt: _showProfilePrompt,
-  onDismissProfilePrompt: _onDismissProfilePrompt,
-  onNavigateToProfile: _onNavigateToProfile
+  showProfilePrompt,
+  onDismissProfilePrompt,
+  onNavigateToProfile
 }: TodayScreenProps) {
   const nextSession = plan.sessions.find(
     (session) => session.status === 'planned' || session.status === 'modified'
@@ -36,6 +37,27 @@ export function TodayScreen({
 
   return (
     <div>
+      {showProfilePrompt ? (
+        <section className="profile-prompt" role="region" aria-label="Profile prompt">
+          <div className="profile-prompt__icon">
+            <Sparkles aria-hidden="true" />
+          </div>
+          <div className="profile-prompt__body">
+            <p>Set up your profile to make Hybrid Coach feel like yours.</p>
+            <button type="button" className="primary-action" onClick={onNavigateToProfile}>
+              Set up profile
+            </button>
+          </div>
+          <button
+            type="button"
+            className="profile-prompt__dismiss"
+            aria-label="Dismiss profile prompt"
+            onClick={onDismissProfilePrompt}
+          >
+            <X aria-hidden="true" />
+          </button>
+        </section>
+      ) : null}
       <header className="screen-header">
         <div>
           <p className="eyebrow">Today</p>

@@ -88,4 +88,32 @@ describe('App', () => {
     const recentLogs = screen.getByRole('region', { name: /recent logs/i });
     expect(within(recentLogs).getByText(/felt strong/i)).toBeInTheDocument();
   });
+
+  it('shows the profile prompt on first launch', () => {
+    render(<App />);
+    expect(screen.getByText(/set up your profile to make hybrid coach feel like yours/i)).toBeInTheDocument();
+  });
+
+  it('dismisses the profile prompt and remembers the dismissal', async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<App />);
+
+    const banner = screen.getByRole('region', { name: /profile prompt/i });
+    await user.click(within(banner).getByRole('button', { name: /dismiss profile prompt/i }));
+
+    expect(screen.queryByRole('region', { name: /profile prompt/i })).not.toBeInTheDocument();
+
+    unmount();
+    render(<App />);
+    expect(screen.queryByRole('region', { name: /profile prompt/i })).not.toBeInTheDocument();
+  });
+
+  it('navigates to the profile screen from the prompt', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /set up profile/i }));
+
+    expect(screen.getByRole('heading', { name: /training context/i })).toBeInTheDocument();
+  });
 });

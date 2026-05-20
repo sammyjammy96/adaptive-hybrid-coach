@@ -630,3 +630,68 @@ button {
 .destructive-action:hover {
   background: rgba(255, 111, 111, 0.08);
 }
+
+.profile-prompt {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem 2.4rem 0.9rem 0.9rem;
+  border: 1px solid rgba(126, 224, 178, 0.28);
+  border-radius: 0.95rem;
+  background: rgba(126, 224, 178, 0.06);
+}
+
+.profile-prompt__icon {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  color: #07110d;
+  background: #7ee0b2;
+}
+
+.profile-prompt__icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.profile-prompt__body {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.profile-prompt__body p {
+  margin: 0;
+  color: #d5e1f3;
+}
+
+.profile-prompt__body .primary-action {
+  justify-self: start;
+}
+
+.profile-prompt__dismiss {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #aab5c5;
+  background: transparent;
+}
+
+.profile-prompt__dismiss:hover {
+  color: #ecf2ff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.profile-prompt__dismiss svg {
+  width: 1rem;
+  height: 1rem;
+}
