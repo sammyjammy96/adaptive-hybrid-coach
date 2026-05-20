@@ -1,7 +1,7 @@
-import { demoImportedWorkouts } from './demoData';
+import { demoImportedWorkouts, demoProfile } from './demoData';
 import { dayOrder } from './planning';
 import { planTemplates, type PlanVariantIndex } from './planTemplates';
-import type { ImportedWorkout, PlannedSession, ReviewState, TrainingLog, WeeklyPlan } from './types';
+import type { AthleteProfile, ImportedWorkout, PlannedSession, ReviewState, TrainingLog, WeeklyPlan } from './types';
 
 export type ScreenKey = 'today' | 'plan' | 'import' | 'log' | 'profile';
 
@@ -12,6 +12,9 @@ export interface AppState {
   logs: TrainingLog[];
   planVariantIndex: PlanVariantIndex;
   schemaVersion: 1;
+  profile: AthleteProfile;
+  hasCustomizedProfile: boolean;
+  hasDismissedProfilePrompt: boolean;
 }
 
 export const initialAppState: AppState = {
@@ -21,7 +24,10 @@ export const initialAppState: AppState = {
   plan: planTemplates[0],
   logs: [],
   planVariantIndex: 0,
-  schemaVersion: 1
+  schemaVersion: 1,
+  profile: demoProfile,
+  hasCustomizedProfile: false,
+  hasDismissedProfilePrompt: false
 };
 
 export function findNextHardPlannedSession(plan: WeeklyPlan): PlannedSession | undefined {
@@ -43,6 +49,8 @@ export type AppAction =
   | { type: 'REGENERATE_WEEK' }
   | { type: 'ADD_UPLOADED_WORKOUT'; fileName: string }
   | { type: 'SAVE_LOG'; log: TrainingLog }
+  | { type: 'UPDATE_PROFILE'; profile: AthleteProfile }
+  | { type: 'DISMISS_PROFILE_PROMPT' }
   | { type: 'RESET_TO_DEMO' };
 
 function setReviewState(workouts: ImportedWorkout[], id: string, reviewState: ReviewState): ImportedWorkout[] {
@@ -153,6 +161,14 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'SAVE_LOG':
       return { ...state, logs: [...state.logs, action.log] };
+
+    case 'UPDATE_PROFILE':
+      if (action.profile === state.profile) return state;
+      return { ...state, profile: action.profile, hasCustomizedProfile: true };
+
+    case 'DISMISS_PROFILE_PROMPT':
+      if (state.hasDismissedProfilePrompt) return state;
+      return { ...state, hasDismissedProfilePrompt: true };
 
     case 'RESET_TO_DEMO':
       return initialAppState;

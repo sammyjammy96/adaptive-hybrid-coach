@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { demoImportedWorkouts, demoWeeklyPlan } from './demoData';
 import { appReducer, findNextHardPlannedSession, initialAppState, nextEmptyDay } from './appState';
 import { planTemplates } from './planTemplates';
-import type { PlannedSession, TrainingLog } from './types';
+import type { AthleteProfile, PlannedSession, TrainingLog } from './types';
 
 describe('findNextHardPlannedSession', () => {
   it('returns the first planned session whose intensity is high', () => {
@@ -175,5 +175,38 @@ describe('appReducer', () => {
     const dirty = appReducer(initialAppState, { type: 'SAVE_LOG', log });
     const reset = appReducer(dirty, { type: 'RESET_TO_DEMO' });
     expect(reset).toBe(initialAppState);
+  });
+
+  it('UPDATE_PROFILE replaces the profile and flips hasCustomizedProfile', () => {
+    const nextProfile: AthleteProfile = { ...initialAppState.profile, name: 'Sam' };
+    const next = appReducer(initialAppState, { type: 'UPDATE_PROFILE', profile: nextProfile });
+    expect(next.profile).toBe(nextProfile);
+    expect(next.hasCustomizedProfile).toBe(true);
+  });
+
+  it('UPDATE_PROFILE with the current profile reference returns state unchanged', () => {
+    const next = appReducer(initialAppState, { type: 'UPDATE_PROFILE', profile: initialAppState.profile });
+    expect(next).toBe(initialAppState);
+  });
+
+  it('DISMISS_PROFILE_PROMPT sets the flag to true', () => {
+    const next = appReducer(initialAppState, { type: 'DISMISS_PROFILE_PROMPT' });
+    expect(next.hasDismissedProfilePrompt).toBe(true);
+  });
+
+  it('DISMISS_PROFILE_PROMPT is a no-op when already dismissed', () => {
+    const dismissed = appReducer(initialAppState, { type: 'DISMISS_PROFILE_PROMPT' });
+    const again = appReducer(dismissed, { type: 'DISMISS_PROFILE_PROMPT' });
+    expect(again).toBe(dismissed);
+  });
+
+  it('RESET_TO_DEMO resets profile and both profile flags', () => {
+    const customProfile: AthleteProfile = { ...initialAppState.profile, name: 'Sam' };
+    const dirty = appReducer(initialAppState, { type: 'UPDATE_PROFILE', profile: customProfile });
+    const dismissed = appReducer(dirty, { type: 'DISMISS_PROFILE_PROMPT' });
+    const reset = appReducer(dismissed, { type: 'RESET_TO_DEMO' });
+    expect(reset.profile).toBe(initialAppState.profile);
+    expect(reset.hasCustomizedProfile).toBe(false);
+    expect(reset.hasDismissedProfilePrompt).toBe(false);
   });
 });
