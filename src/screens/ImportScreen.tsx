@@ -1,13 +1,28 @@
 import { CheckCircle2, RotateCcw, UploadCloud } from 'lucide-react';
+import { useRef } from 'react';
+import type { ChangeEvent } from 'react';
 import type { ImportedWorkout } from '../domain/types';
 
 interface ImportScreenProps {
   workouts: ImportedWorkout[];
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
+  onUpload: (fileName: string) => void;
 }
 
-export function ImportScreen({ workouts, onApprove, onReject }: ImportScreenProps) {
+export function ImportScreen({ workouts, onApprove, onReject, onUpload }: ImportScreenProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) {
+      onUpload(file.name);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }
+
   return (
     <div>
       <header className="screen-header">
@@ -15,9 +30,17 @@ export function ImportScreen({ workouts, onApprove, onReject }: ImportScreenProp
           <p className="eyebrow">Import</p>
           <h1>Review gym programming before it affects the plan.</h1>
         </div>
-        <button type="button" className="primary-action icon-action">
+        <label className="primary-action icon-action upload-button">
           <UploadCloud aria-hidden="true" /> Upload screenshot
-        </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="visually-hidden"
+            onChange={handleFileChange}
+          />
+        </label>
       </header>
       <div className="grid">
         {workouts.map((workout) => {
