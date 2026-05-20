@@ -465,3 +465,39 @@ button {
     width: 7.8rem;
   }
 }
+
+.review-toggle {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.review-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: #cbd5e1;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.review-button svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.review-button.approve.is-active {
+  border-color: transparent;
+  color: #07110d;
+  background: #7ee0b2;
+}
+
+.review-button.reject.is-active {
+  border-color: transparent;
+  color: #2a1300;
+  background: #ffd27a;
+}

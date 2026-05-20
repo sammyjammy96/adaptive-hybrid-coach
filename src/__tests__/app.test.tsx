@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from '../App';
@@ -33,5 +33,20 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: /kai's training context/i })).toBeInTheDocument();
     expect(screen.getByText(/secure backend/i)).toBeInTheDocument();
+  });
+
+  it('toggles the review state of an imported workout', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /import/i })[0]);
+
+    const card = screen.getByText('Gymnastics skill + engine').closest('article');
+    expect(card).not.toBeNull();
+    const approveButton = within(card as HTMLElement).getByRole('button', { name: /approve/i });
+
+    await user.click(approveButton);
+
+    expect(approveButton).toHaveAttribute('aria-pressed', 'true');
   });
 });

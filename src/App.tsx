@@ -29,7 +29,13 @@ export default function App() {
         <TodayScreen plan={protectedPlan} readiness={demoReadiness} recommendation={demoRecommendations[0]} />
       ) : null}
       {state.activeScreen === 'plan' ? <PlanScreen plan={protectedPlan} /> : null}
-      {state.activeScreen === 'import' ? <ImportScreen workouts={state.workouts} /> : null}
+      {state.activeScreen === 'import' ? (
+        <ImportScreen
+          workouts={state.workouts}
+          onApprove={(id) => dispatch({ type: 'APPROVE_WORKOUT', id })}
+          onReject={(id) => dispatch({ type: 'REJECT_WORKOUT', id })}
+        />
+      ) : null}
       {state.activeScreen === 'log' ? <LogScreen plan={protectedPlan} logs={state.logs} /> : null}
       {state.activeScreen === 'profile' ? <ProfileScreen profile={demoProfile} /> : null}
     </AppChrome>
