@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { AthleteProfile } from '../domain/types';
 import { AvailabilityEditor } from '../components/AvailabilityEditor';
+import { PrEditor } from '../components/PrEditor';
 
 interface ProfileScreenProps {
   profile: AthleteProfile;
@@ -156,7 +157,11 @@ export function ProfileScreen({ profile, hasCustomizedProfile, onUpdate, onReset
           value={draft.weeklyAvailability}
           onChange={(next) => updateField('weeklyAvailability', next)}
         />
-        {/* PR and injury flag editors are added in Tasks 7–8. */}
+        <PrEditor
+          value={draft.prs}
+          onChange={(next) => updateField('prs', next)}
+        />
+        {/* Injury flag editor is added in Task 8. */}
 
         <div className="log-actions">
           <button

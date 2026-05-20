@@ -833,3 +833,74 @@ button {
 .availability-minutes input:disabled {
   opacity: 0.45;
 }
+
+.editor-empty {
+  margin: 0;
+  color: #aab5c5;
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.pr-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.pr-lift {
+  color: #ecf2ff;
+  font-weight: 700;
+}
+
+.pr-value {
+  color: #aab5c5;
+}
+
+.editor-add {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  border-style: dashed;
+  background: transparent;
+}
+
+.editor-add-field {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.editor-add input {
+  width: 100%;
+  min-height: 2.4rem;
+  padding: 0 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.6rem;
+  color: #ecf2ff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.icon-button {
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border: 0;
+  border-radius: 0.6rem;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.icon-button:hover {
+  color: #ecf2ff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.icon-button svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}

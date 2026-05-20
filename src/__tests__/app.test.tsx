@@ -152,4 +152,27 @@ describe('App', () => {
 
     expect(screen.getByText(/name is required/i)).toBeInTheDocument();
   });
+
+  it('adding a PR then removing it leaves no trace of the entry', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+
+    const saveButton = screen.getByRole('button', { name: /save profile/i });
+    expect(saveButton).toBeDisabled();
+
+    const liftInput = screen.getByPlaceholderText(/lift \(e\.g\. back squat\)/i);
+    const valueInput = screen.getByPlaceholderText(/value \(e\.g\. 150 kg\)/i);
+    await user.type(liftInput, 'Snatch double');
+    await user.type(valueInput, '70 kg');
+
+    await user.click(screen.getByRole('button', { name: /^add pr$/i }));
+
+    expect(saveButton).not.toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: /remove snatch double/i }));
+
+    expect(screen.queryByText('Snatch double')).not.toBeInTheDocument();
+  });
 });
