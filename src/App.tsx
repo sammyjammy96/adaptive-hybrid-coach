@@ -1,45 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { AppChrome, type ScreenKey } from './components/AppChrome';
-import {
-  demoImportedWorkouts,
-  demoProfile,
-  demoReadiness,
-  demoRecommendations,
-  demoWeeklyPlan
-} from './domain/demoData';
+import { appReducer, initialAppState } from './domain/appState';
+import { demoProfile, demoReadiness, demoRecommendations } from './domain/demoData';
 import { protectRunsAfterHeavyLowerBody } from './domain/planning';
 import { ImportScreen } from './screens/ImportScreen';
 import { LogScreen } from './screens/LogScreen';
 import { PlanScreen } from './screens/PlanScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { TodayScreen } from './screens/TodayScreen';
-import { loadLocalValue, saveLocalValue } from './services/localStore';
-
-function isScreenKey(value: string): value is ScreenKey {
-  return ['today', 'plan', 'import', 'log', 'profile'].includes(value);
-}
+import { loadAppState, saveAppState } from './services/appPersistence';
 
 export default function App() {
-  const [activeScreen, setActiveScreen] = useState<ScreenKey>(() => {
-    const stored = loadLocalValue('hybrid-coach-active-screen', 'today');
-    return isScreenKey(stored) ? stored : 'today';
-  });
-  const protectedPlan = protectRunsAfterHeavyLowerBody(demoWeeklyPlan, demoImportedWorkouts);
+  const [state, dispatch] = useReducer(appReducer, undefined, loadAppState);
+
+  useEffect(() => {
+    saveAppState(state);
+  }, [state]);
+
+  const protectedPlan = protectRunsAfterHeavyLowerBody(state.plan, state.workouts);
 
   function navigate(screen: ScreenKey) {
-    setActiveScreen(screen);
-    saveLocalValue('hybrid-coach-active-screen', screen);
+    dispatch({ type: 'SET_ACTIVE_SCREEN', screen });
   }
 
   return (
-    <AppChrome activeScreen={activeScreen} onNavigate={navigate}>
-      {activeScreen === 'today' ? (
+    <AppChrome activeScreen={state.activeScreen} onNavigate={navigate}>
+      {state.activeScreen === 'today' ? (
         <TodayScreen plan={protectedPlan} readiness={demoReadiness} recommendation={demoRecommendations[0]} />
       ) : null}
-      {activeScreen === 'plan' ? <PlanScreen plan={protectedPlan} /> : null}
-      {activeScreen === 'import' ? <ImportScreen workouts={demoImportedWorkouts} /> : null}
-      {activeScreen === 'log' ? <LogScreen /> : null}
-      {activeScreen === 'profile' ? <ProfileScreen profile={demoProfile} /> : null}
+      {state.activeScreen === 'plan' ? <PlanScreen plan={protectedPlan} /> : null}
+      {state.activeScreen === 'import' ? <ImportScreen workouts={state.workouts} /> : null}
+      {state.activeScreen === 'log' ? <LogScreen plan={protectedPlan} logs={state.logs} /> : null}
+      {state.activeScreen === 'profile' ? <ProfileScreen profile={demoProfile} /> : null}
     </AppChrome>
   );
 }

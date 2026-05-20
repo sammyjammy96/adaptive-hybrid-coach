@@ -1,4 +1,11 @@
-export function LogScreen() {
+import type { TrainingLog, WeeklyPlan } from '../domain/types';
+
+interface LogScreenProps {
+  plan: WeeklyPlan;
+  logs: TrainingLog[];
+}
+
+export function LogScreen(_props: LogScreenProps) {
   return (
     <div>
       <header className="screen-header">
@@ -29,9 +36,7 @@ export function LogScreen() {
           Notes
           <textarea rows={4} placeholder="What changed, what felt good, what felt risky?" />
         </label>
-        <button type="button" className="primary-action">
-          Save log
-        </button>
+        <button type="button" className="primary-action">Save log</button>
       </form>
     </div>
   );
