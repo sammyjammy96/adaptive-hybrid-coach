@@ -36,7 +36,6 @@ export function ImportScreen({ workouts, onApprove, onReject, onUpload }: Import
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             className="visually-hidden"
             onChange={handleFileChange}
           />
