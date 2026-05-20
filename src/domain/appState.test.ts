@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { demoImportedWorkouts, demoWeeklyPlan } from './demoData';
 import { findNextHardPlannedSession, initialAppState, nextEmptyDay } from './appState';
 import { planTemplates } from './planTemplates';
+import type { PlannedSession } from './types';
 
 describe('findNextHardPlannedSession', () => {
   it('returns the first planned session whose intensity is high', () => {
@@ -17,14 +18,24 @@ describe('findNextHardPlannedSession', () => {
     expect(findNextHardPlannedSession(plan)).toBeUndefined();
   });
 
-  it('skips sessions that are no longer planned', () => {
+  it('returns the next high-intensity planned session, skipping completed ones', () => {
+    const tueHard: PlannedSession = {
+      id: 'tue-hard',
+      day: 'Tue',
+      type: 'crossfit',
+      title: 'Heavy day',
+      purpose: 'Test fixture',
+      durationMinutes: 60,
+      intensity: 'high',
+      status: 'planned'
+    };
     const plan = {
       ...demoWeeklyPlan,
-      sessions: demoWeeklyPlan.sessions.map((session) =>
-        session.id === 'mon-cf' ? { ...session, status: 'completed' as const } : session
-      )
+      sessions: demoWeeklyPlan.sessions
+        .map((session) => session.id === 'mon-cf' ? { ...session, status: 'completed' as const } : session)
+        .concat(tueHard)
     };
-    expect(findNextHardPlannedSession(plan)).toBeUndefined();
+    expect(findNextHardPlannedSession(plan)?.id).toBe('tue-hard');
   });
 });
 

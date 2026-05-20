@@ -8,10 +8,10 @@ import type {
   WeeklyPlan
 } from './types';
 
-const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+export const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 function nextDay(day: string) {
-  const index = dayOrder.indexOf(day);
+  const index = dayOrder.indexOf(day as (typeof dayOrder)[number]);
   return dayOrder[(index + 1) % dayOrder.length];
 }
 
@@ -44,7 +44,7 @@ export function protectRunsAfterHeavyLowerBody(plan: WeeklyPlan, workouts: Impor
   return {
     ...plan,
     sessions: plan.sessions.map((session) => {
-      if (!protectedDays.has(session.day) || !isRun(session.type)) {
+      if (!protectedDays.has(session.day as (typeof dayOrder)[number]) || !isRun(session.type)) {
         return session;
       }
 
