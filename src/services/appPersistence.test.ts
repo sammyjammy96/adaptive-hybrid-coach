@@ -47,4 +47,34 @@ describe('appPersistence', () => {
     const loaded = loadAppState();
     expect(loaded.activeScreen).toBe(initialAppState.activeScreen);
   });
+
+  it('hydrates legacy v1 payloads that lack profile fields with defaults', () => {
+    const legacy = {
+      activeScreen: 'today',
+      workouts: initialAppState.workouts,
+      plan: initialAppState.plan,
+      logs: [],
+      planVariantIndex: 0,
+      schemaVersion: 1
+    };
+    window.localStorage.setItem(STATE_KEY, JSON.stringify(legacy));
+    const loaded = loadAppState();
+    expect(loaded.profile).toEqual(initialAppState.profile);
+    expect(loaded.hasCustomizedProfile).toBe(false);
+    expect(loaded.hasDismissedProfilePrompt).toBe(false);
+  });
+
+  it('round-trips a custom profile and the prompt flags', () => {
+    const custom = {
+      ...initialAppState,
+      profile: { ...initialAppState.profile, name: 'Sam' },
+      hasCustomizedProfile: true,
+      hasDismissedProfilePrompt: true
+    };
+    saveAppState(custom);
+    const loaded = loadAppState();
+    expect(loaded.profile.name).toBe('Sam');
+    expect(loaded.hasCustomizedProfile).toBe(true);
+    expect(loaded.hasDismissedProfilePrompt).toBe(true);
+  });
 });
