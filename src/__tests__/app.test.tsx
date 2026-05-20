@@ -122,6 +122,7 @@ describe('App', () => {
     render(<App />);
 
     await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+    await user.click(screen.getByRole('button', { name: /edit profile/i }));
 
     const nameInput = screen.getByLabelText(/^name$/i) as HTMLInputElement;
     await user.clear(nameInput);
@@ -141,40 +142,32 @@ describe('App', () => {
     render(<App />);
 
     await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+    await user.click(screen.getByRole('button', { name: /edit profile/i }));
 
     const nameInput = screen.getByLabelText(/^name$/i) as HTMLInputElement;
     await user.clear(nameInput);
 
-    const saveButton = screen.getByRole('button', { name: /save profile/i });
-    expect(saveButton).not.toBeDisabled();
-
-    await user.click(saveButton);
+    await user.click(screen.getByRole('button', { name: /save profile/i }));
 
     expect(screen.getByText(/name is required/i)).toBeInTheDocument();
   });
 
-  it('adding a PR then removing it returns the form to a clean state', async () => {
+  it('cancel discards profile edits without changing the saved profile', async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
-
-    const saveButton = screen.getByRole('button', { name: /save profile/i });
-    expect(saveButton).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: /edit profile/i }));
 
     const liftInput = screen.getByPlaceholderText(/lift \(e\.g\. back squat\)/i);
     const valueInput = screen.getByPlaceholderText(/value \(e\.g\. 150 kg\)/i);
     await user.type(liftInput, 'Snatch double');
     await user.type(valueInput, '70 kg');
-
     await user.click(screen.getByRole('button', { name: /^add pr$/i }));
 
-    expect(saveButton).not.toBeDisabled();
-
-    await user.click(screen.getByRole('button', { name: /remove snatch double/i }));
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
 
     expect(screen.queryByText('Snatch double')).not.toBeInTheDocument();
-    expect(saveButton).toBeDisabled();
   });
 
   it('resetting prototype data brings the profile prompt back', async () => {
@@ -186,6 +179,7 @@ describe('App', () => {
 
       // Save a custom profile so the prompt hides.
       await user.click(screen.getAllByRole('button', { name: /profile/i })[0]);
+      await user.click(screen.getByRole('button', { name: /edit profile/i }));
       const nameInput = screen.getByLabelText(/^name$/i) as HTMLInputElement;
       await user.clear(nameInput);
       await user.type(nameInput, 'Sam');
