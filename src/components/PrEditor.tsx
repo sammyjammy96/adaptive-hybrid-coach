@@ -27,6 +27,10 @@ export function PrEditor({ value, onChange }: PrEditorProps) {
     onChange(value.filter((_, i) => i !== index));
   }
 
+  function updatePr(index: number, patch: Partial<PersonalRecord>) {
+    onChange(value.map((pr, i) => (i === index ? { ...pr, ...patch } : pr)));
+  }
+
   return (
     <fieldset className="editor-fieldset">
       <legend>Personal records</legend>
@@ -35,13 +39,27 @@ export function PrEditor({ value, onChange }: PrEditorProps) {
       ) : (
         <ul className="editor-list">
           {value.map((pr, index) => (
-            <li key={`${pr.lift}-${index}`} className="editor-row pr-row">
-              <span className="pr-lift">{pr.lift}</span>
-              <span className="pr-value">{pr.value}</span>
+            <li key={index} className="editor-row pr-row">
+              <label className="editor-row-field">
+                <span className="visually-hidden">Lift name</span>
+                <input
+                  type="text"
+                  value={pr.lift}
+                  onChange={(event) => updatePr(index, { lift: event.target.value })}
+                />
+              </label>
+              <label className="editor-row-field">
+                <span className="visually-hidden">Lift value</span>
+                <input
+                  type="text"
+                  value={pr.value}
+                  onChange={(event) => updatePr(index, { value: event.target.value })}
+                />
+              </label>
               <button
                 type="button"
                 className="icon-button"
-                aria-label={`Remove ${pr.lift}`}
+                aria-label={`Remove ${pr.lift || 'PR'}`}
                 onClick={() => handleRemove(index)}
               >
                 <Trash2 aria-hidden="true" />

@@ -24,6 +24,10 @@ export function InjuryFlagEditor({ value, onChange }: InjuryFlagEditorProps) {
     onChange(value.filter((_, i) => i !== index));
   }
 
+  function updateFlag(index: number, raw: string) {
+    onChange(value.map((flag, i) => (i === index ? raw : flag)));
+  }
+
   return (
     <fieldset className="editor-fieldset">
       <legend>Injury flags</legend>
@@ -32,12 +36,19 @@ export function InjuryFlagEditor({ value, onChange }: InjuryFlagEditorProps) {
       ) : (
         <ul className="editor-list">
           {value.map((flag, index) => (
-            <li key={`${flag}-${index}`} className="editor-row flag-row">
-              <span className="flag-text">{flag}</span>
+            <li key={index} className="editor-row flag-row">
+              <label className="editor-row-field">
+                <span className="visually-hidden">Injury flag</span>
+                <input
+                  type="text"
+                  value={flag}
+                  onChange={(event) => updateFlag(index, event.target.value)}
+                />
+              </label>
               <button
                 type="button"
                 className="icon-button"
-                aria-label={`Remove ${flag}`}
+                aria-label={`Remove ${flag || 'flag'}`}
                 onClick={() => handleRemove(index)}
               >
                 <Trash2 aria-hidden="true" />
@@ -48,7 +59,7 @@ export function InjuryFlagEditor({ value, onChange }: InjuryFlagEditorProps) {
       )}
       <div className="editor-row editor-add flag-add">
         <label className="editor-add-field">
-          <span className="visually-hidden">Injury flag</span>
+          <span className="visually-hidden">New injury flag</span>
           <input
             type="text"
             placeholder="e.g. Watch left calf"
