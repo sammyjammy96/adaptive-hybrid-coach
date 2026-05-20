@@ -760,3 +760,76 @@ button {
   font-size: 0.85rem;
   font-style: italic;
 }
+
+.editor-fieldset {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.editor-fieldset legend {
+  padding: 0;
+  margin-bottom: 0.2rem;
+}
+
+.editor-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor-row {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.availability-row {
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.availability-day {
+  color: #7ee0b2;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.availability-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.availability-minutes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.availability-minutes input {
+  width: 4.5rem;
+  min-height: 2.4rem;
+  padding: 0 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.6rem;
+  color: #ecf2ff;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: right;
+}
+
+.availability-minutes input:disabled {
+  opacity: 0.45;
+}
