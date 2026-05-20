@@ -56,6 +56,13 @@ function setReviewState(workouts: ImportedWorkout[], id: string, reviewState: Re
 }
 
 function applyEasier(session: PlannedSession): PlannedSession {
+  const alreadyEasier =
+    session.title.startsWith('Easier: ') &&
+    session.intensity === 'low' &&
+    session.status === 'modified';
+  if (alreadyEasier) {
+    return session;
+  }
   if (session.title.startsWith('Easier: ')) {
     return { ...session, intensity: 'low', status: 'modified' };
   }
@@ -152,7 +159,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     default: {
       const _exhaustive: never = action;
-      return state;
+      throw new Error(`Unknown action: ${JSON.stringify(_exhaustive)}`);
     }
   }
 }

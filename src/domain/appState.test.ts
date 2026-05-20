@@ -84,7 +84,8 @@ describe('appReducer', () => {
 
   it('APPROVE_WORKOUT is a no-op for an unknown id', () => {
     const next = appReducer(initialAppState, { type: 'APPROVE_WORKOUT', id: 'does-not-exist' });
-    expect(next.workouts).toEqual(initialAppState.workouts);
+    expect(next).toBe(initialAppState);
+    expect(next.workouts).toBe(initialAppState.workouts);
   });
 
   it('REJECT_WORKOUT sets reviewState back to needs-review', () => {
@@ -116,7 +117,8 @@ describe('appReducer', () => {
     };
     const state = { ...initialAppState, plan };
     const next = appReducer(state, { type: 'APPLY_EASY_VERSION', flavor: 'easier' });
-    expect(next.plan).toEqual(plan);
+    expect(next).toBe(state);
+    expect(next.plan).toBe(plan);
   });
 
   it('RESTORE_SESSION reverts a modified session to the variant template version', () => {
@@ -129,13 +131,14 @@ describe('appReducer', () => {
 
   it('RESTORE_SESSION is a no-op for an unknown session id', () => {
     const next = appReducer(initialAppState, { type: 'RESTORE_SESSION', sessionId: 'no-such-id' });
-    expect(next.plan).toEqual(initialAppState.plan);
+    expect(next).toBe(initialAppState);
+    expect(next.plan).toBe(initialAppState.plan);
   });
 
   it('REGENERATE_WEEK cycles to the next variant', () => {
     const next = appReducer(initialAppState, { type: 'REGENERATE_WEEK' });
     expect(next.planVariantIndex).toBe(1);
-    expect(next.plan.sessions[0].id).toBe('mon-cf');
+    expect(next.plan).toBe(planTemplates[1]);
   });
 
   it('REGENERATE_WEEK wraps from variant 2 back to 0', () => {
@@ -152,6 +155,7 @@ describe('appReducer', () => {
     expect(added.reviewState).toBe('needs-review');
     expect(added.title).toBe('Uploaded: screenshot.png');
     expect(added.id.startsWith('uploaded-')).toBe(true);
+    expect(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']).toContain(added.day);
   });
 
   it('SAVE_LOG appends to logs array', () => {
@@ -170,6 +174,6 @@ describe('appReducer', () => {
     const log: TrainingLog = { sessionId: 'mon-cf', completion: 'completed', rpe: 7, durationMinutes: 60, notes: '' };
     const dirty = appReducer(initialAppState, { type: 'SAVE_LOG', log });
     const reset = appReducer(dirty, { type: 'RESET_TO_DEMO' });
-    expect(reset).toEqual(initialAppState);
+    expect(reset).toBe(initialAppState);
   });
 });
