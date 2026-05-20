@@ -34,7 +34,7 @@ export function loadAppState(): AppState {
     return initialAppState;
   }
   const candidate = raw as Partial<AppState>;
-  if (candidate.schemaVersion !== 1) {
+  if (candidate.schemaVersion !== 2) {
     return initialAppState;
   }
   if (!isValidShape(candidate)) {

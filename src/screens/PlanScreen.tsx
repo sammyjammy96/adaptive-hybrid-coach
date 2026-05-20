@@ -1,15 +1,15 @@
 import { SessionCard } from '../components/SessionCard';
-import { variantLabels, type PlanVariantIndex } from '../domain/planTemplates';
+import type { PlanTags } from '../domain/planLibrary';
 import type { WeeklyPlan } from '../domain/types';
 
 interface PlanScreenProps {
   plan: WeeklyPlan;
-  variantIndex: PlanVariantIndex;
+  tags: PlanTags;
   onRegenerateWeek: () => void;
   onRestore: (sessionId: string) => void;
 }
 
-export function PlanScreen({ plan, variantIndex, onRegenerateWeek, onRestore }: PlanScreenProps) {
+export function PlanScreen({ plan, tags, onRegenerateWeek, onRestore }: PlanScreenProps) {
   return (
     <div>
       <header className="screen-header">
@@ -18,7 +18,9 @@ export function PlanScreen({ plan, variantIndex, onRegenerateWeek, onRestore }: 
           <h1>{plan.weekLabel}</h1>
         </div>
         <div className="plan-header-actions">
-          <span className="variant-pill">Variant: {variantLabels[variantIndex]}</span>
+          <span className="tag-summary">
+            Tags: {tags.emphasis} · {tags.load} · {tags.volume}
+          </span>
           <button type="button" className="secondary-action" onClick={onRegenerateWeek}>
             Regenerate week
           </button>

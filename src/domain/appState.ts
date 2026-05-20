@@ -1,7 +1,17 @@
 import { demoImportedWorkouts, demoProfile } from './demoData';
 import { dayOrder } from './planning';
-import { planTemplates, type PlanVariantIndex } from './planTemplates';
-import type { AthleteProfile, ImportedWorkout, PlannedSession, ReviewState, TrainingLog, WeeklyPlan } from './types';
+import { findTaggedBySlug, planLibrary, type PlanTags } from './planLibrary';
+import { pickPlan } from './planPicker';
+import type {
+  AthleteProfile,
+  AvailabilityWindow,
+  ImportedWorkout,
+  PlannedSession,
+  ReadinessCheckIn,
+  ReviewState,
+  TrainingLog,
+  WeeklyPlan
+} from './types';
 
 export type ScreenKey = 'today' | 'plan' | 'import' | 'log' | 'profile';
 
@@ -10,24 +20,27 @@ export interface AppState {
   workouts: ImportedWorkout[];
   plan: WeeklyPlan;
   logs: TrainingLog[];
-  planVariantIndex: PlanVariantIndex;
-  schemaVersion: 1;
+  schemaVersion: 2;
   profile: AthleteProfile;
   hasCustomizedProfile: boolean;
   hasDismissedProfilePrompt: boolean;
+  planTags: PlanTags;
+  planRationale: string;
 }
+
+const starter = findTaggedBySlug('balanced-moderate') ?? planLibrary[0];
 
 export const initialAppState: AppState = {
   activeScreen: 'today',
   workouts: demoImportedWorkouts,
-  // variant 0 is the base plan (see planTemplates.ts and variantLabels)
-  plan: planTemplates[0],
+  plan: starter.plan,
   logs: [],
-  planVariantIndex: 0,
-  schemaVersion: 1,
+  schemaVersion: 2,
   profile: demoProfile,
   hasCustomizedProfile: false,
-  hasDismissedProfilePrompt: false
+  hasDismissedProfilePrompt: false,
+  planTags: starter.tags,
+  planRationale: 'Balanced hybrid week — a sensible starting point.'
 };
 
 export function findNextHardPlannedSession(plan: WeeklyPlan): PlannedSession | undefined {
@@ -46,7 +59,7 @@ export type AppAction =
   | { type: 'REJECT_WORKOUT'; id: string }
   | { type: 'APPLY_EASY_VERSION'; flavor: 'easier' | 'recovery' }
   | { type: 'RESTORE_SESSION'; sessionId: string }
-  | { type: 'REGENERATE_WEEK' }
+  | { type: 'PICK_NEW_PLAN'; readiness: ReadinessCheckIn; availability: AvailabilityWindow[]; goal: string }
   | { type: 'ADD_UPLOADED_WORKOUT'; fileName: string }
   | { type: 'SAVE_LOG'; log: TrainingLog }
   | { type: 'UPDATE_PROFILE'; profile: AthleteProfile }
@@ -126,8 +139,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'RESTORE_SESSION': {
-      const template = planTemplates[state.planVariantIndex];
-      const originalSession = template.sessions.find((s) => s.id === action.sessionId);
+      const template = findTaggedBySlug(state.planTags.slug);
+      if (!template) return state;
+      const originalSession = template.plan.sessions.find((s) => s.id === action.sessionId);
       if (!originalSession) return state;
       const sessions = state.plan.sessions.map((session) =>
         session.id === action.sessionId ? { ...originalSession } : session
@@ -135,9 +149,20 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, plan: { ...state.plan, sessions } };
     }
 
-    case 'REGENERATE_WEEK': {
-      const nextIndex = ((state.planVariantIndex + 1) % 3) as PlanVariantIndex;
-      return { ...state, planVariantIndex: nextIndex, plan: planTemplates[nextIndex] };
+    case 'PICK_NEW_PLAN': {
+      const result = pickPlan({
+        logs: state.logs,
+        readiness: action.readiness,
+        availability: action.availability,
+        goal: action.goal,
+        excludeSlugs: [state.planTags.slug]
+      });
+      return {
+        ...state,
+        plan: result.tagged.plan,
+        planTags: result.tagged.tags,
+        planRationale: result.rationale
+      };
     }
 
     case 'ADD_UPLOADED_WORKOUT': {

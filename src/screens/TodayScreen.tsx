@@ -11,6 +11,7 @@ interface TodayScreenProps {
   plan: WeeklyPlan;
   readiness: ReadinessCheckIn;
   recommendation: CoachRecommendation;
+  rationale: string;
   onApplyEasyVersion: () => void;
   onRestore: (sessionId: string) => void;
   showProfilePrompt: boolean;
@@ -22,6 +23,7 @@ export function TodayScreen({
   plan,
   readiness,
   recommendation,
+  rationale,
   onApplyEasyVersion,
   onRestore,
   showProfilePrompt,
@@ -72,6 +74,7 @@ export function TodayScreen({
             onAction={onApplyEasyVersion}
             disabled={!canApplyEasy}
           />
+          <p className="rationale-line"><strong>Why this week:</strong> {rationale}</p>
           <SessionCard session={nextSession} onRestore={onRestore} />
         </div>
         <LoadBalance

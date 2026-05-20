@@ -502,7 +502,7 @@ button {
   gap: 0.6rem;
 }
 
-.variant-pill {
+.tag-summary {
   display: inline-flex;
   align-items: center;
   min-height: 1.75rem;
@@ -512,6 +512,20 @@ button {
   color: #aab5c5;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.72rem;
+  text-transform: capitalize;
+}
+
+.rationale-line {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-left: 3px solid #7ee0b2;
+  background: rgba(126, 224, 178, 0.06);
+  color: #d5e1f3;
+  font-size: 0.92rem;
+}
+
+.rationale-line strong {
+  color: #ecf2ff;
 }
 
 @media (max-width: 900px) {

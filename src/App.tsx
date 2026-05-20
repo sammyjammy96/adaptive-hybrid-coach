@@ -30,6 +30,7 @@ export default function App() {
           plan={protectedPlan}
           readiness={demoReadiness}
           recommendation={demoRecommendations[0]}
+          rationale={state.planRationale}
           onApplyEasyVersion={() =>
             dispatch({
               type: 'APPLY_EASY_VERSION',
@@ -45,8 +46,15 @@ export default function App() {
       {state.activeScreen === 'plan' ? (
         <PlanScreen
           plan={protectedPlan}
-          variantIndex={state.planVariantIndex}
-          onRegenerateWeek={() => dispatch({ type: 'REGENERATE_WEEK' })}
+          tags={state.planTags}
+          onRegenerateWeek={() =>
+            dispatch({
+              type: 'PICK_NEW_PLAN',
+              readiness: demoReadiness,
+              availability: state.profile.weeklyAvailability,
+              goal: state.profile.currentGoal
+            })
+          }
           onRestore={(sessionId) => dispatch({ type: 'RESTORE_SESSION', sessionId })}
         />
       ) : null}

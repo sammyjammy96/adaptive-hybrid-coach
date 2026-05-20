@@ -48,20 +48,17 @@ describe('appPersistence', () => {
     expect(loaded.activeScreen).toBe(initialAppState.activeScreen);
   });
 
-  it('hydrates legacy v1 payloads that lack profile fields with defaults', () => {
+  it('drops v1 payloads to demo defaults after the v2 schema bump', () => {
     const legacy = {
-      activeScreen: 'today',
+      activeScreen: 'plan',
       workouts: initialAppState.workouts,
       plan: initialAppState.plan,
-      logs: [],
-      planVariantIndex: 0,
+      logs: [{ sessionId: 'mon-cf', completion: 'completed', rpe: 7, durationMinutes: 60, notes: '' }],
+      planVariantIndex: 1,
       schemaVersion: 1
     };
     window.localStorage.setItem(STATE_KEY, JSON.stringify(legacy));
-    const loaded = loadAppState();
-    expect(loaded.profile).toEqual(initialAppState.profile);
-    expect(loaded.hasCustomizedProfile).toBe(false);
-    expect(loaded.hasDismissedProfilePrompt).toBe(false);
+    expect(loadAppState()).toEqual(initialAppState);
   });
 
   it('round-trips a custom profile and the prompt flags', () => {

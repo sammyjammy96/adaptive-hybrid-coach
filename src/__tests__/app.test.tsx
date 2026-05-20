@@ -170,6 +170,27 @@ describe('App', () => {
     expect(screen.queryByText('Snatch double')).not.toBeInTheDocument();
   });
 
+  it('regenerating the week updates the tag summary and rationale', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: /^plan$/i })[0]);
+
+    const initialTagText = screen.getByText(/^tags: /i).textContent ?? '';
+    await user.click(screen.getAllByRole('button', { name: /today/i })[0]);
+    const initialRationale = screen.getByText(/why this week/i).closest('p')?.textContent ?? '';
+
+    await user.click(screen.getAllByRole('button', { name: /^plan$/i })[0]);
+    await user.click(screen.getByRole('button', { name: /regenerate week/i }));
+
+    const updatedTagText = screen.getByText(/^tags: /i).textContent ?? '';
+    expect(updatedTagText).not.toBe(initialTagText);
+
+    await user.click(screen.getAllByRole('button', { name: /today/i })[0]);
+    const updatedRationale = screen.getByText(/why this week/i).closest('p')?.textContent ?? '';
+    expect(updatedRationale).not.toBe(initialRationale);
+  });
+
   it('resetting prototype data brings the profile prompt back', async () => {
     const user = userEvent.setup();
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);

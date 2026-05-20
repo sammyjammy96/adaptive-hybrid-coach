@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { demoImportedWorkouts, demoWeeklyPlan } from './demoData';
+import { demoImportedWorkouts } from './demoData';
 import { appReducer, findNextHardPlannedSession, initialAppState, nextEmptyDay } from './appState';
-import { planTemplates } from './planTemplates';
+import { findTaggedBySlug } from './planLibrary';
 import type { AthleteProfile, PlannedSession, TrainingLog } from './types';
 
 describe('findNextHardPlannedSession', () => {
   it('returns the first planned session whose intensity is high', () => {
-    const session = findNextHardPlannedSession(demoWeeklyPlan);
+    const session = findNextHardPlannedSession(initialAppState.plan);
     expect(session?.id).toBe('mon-cf');
   });
 
   it('returns undefined when no planned session has high intensity', () => {
     const plan = {
-      ...demoWeeklyPlan,
-      sessions: demoWeeklyPlan.sessions.map((session) => ({ ...session, intensity: 'low' as const }))
+      ...initialAppState.plan,
+      sessions: initialAppState.plan.sessions.map((session) => ({ ...session, intensity: 'low' as const }))
     };
     expect(findNextHardPlannedSession(plan)).toBeUndefined();
   });
@@ -30,8 +30,8 @@ describe('findNextHardPlannedSession', () => {
       status: 'planned'
     };
     const plan = {
-      ...demoWeeklyPlan,
-      sessions: demoWeeklyPlan.sessions
+      ...initialAppState.plan,
+      sessions: initialAppState.plan.sessions
         .map((session) => session.id === 'mon-cf' ? { ...session, status: 'completed' as const } : session)
         .concat(tueHard)
     };
@@ -59,15 +59,15 @@ describe('initialAppState', () => {
     expect(initialAppState.activeScreen).toBe('today');
   });
 
-  it('seeds plan from variant 0 (base)', () => {
-    expect(initialAppState.plan).toBe(planTemplates[0]);
+  it('seeds planTags and planRationale from the starter library entry', () => {
+    expect(initialAppState.planTags.slug).toBe('balanced-moderate');
+    expect(initialAppState.planRationale).toMatch(/balanced hybrid week/i);
+    expect(initialAppState.schemaVersion).toBe(2);
   });
 
   it('uses demo workouts and empty logs', () => {
     expect(initialAppState.workouts).toEqual(demoImportedWorkouts);
     expect(initialAppState.logs).toEqual([]);
-    expect(initialAppState.planVariantIndex).toBe(0);
-    expect(initialAppState.schemaVersion).toBe(1);
   });
 });
 
@@ -135,16 +135,26 @@ describe('appReducer', () => {
     expect(next.plan).toBe(initialAppState.plan);
   });
 
-  it('REGENERATE_WEEK cycles to the next variant', () => {
-    const next = appReducer(initialAppState, { type: 'REGENERATE_WEEK' });
-    expect(next.planVariantIndex).toBe(1);
-    expect(next.plan).toBe(planTemplates[1]);
-  });
+  describe('PICK_NEW_PLAN', () => {
+    const action = {
+      type: 'PICK_NEW_PLAN' as const,
+      readiness: { soreness: 7, energy: 7, sleepQuality: 7, mood: 7, painFlag: false },
+      availability: initialAppState.profile.weeklyAvailability,
+      goal: initialAppState.profile.currentGoal
+    };
 
-  it('REGENERATE_WEEK wraps from variant 2 back to 0', () => {
-    const state = { ...initialAppState, planVariantIndex: 2 as const };
-    const next = appReducer(state, { type: 'REGENERATE_WEEK' });
-    expect(next.planVariantIndex).toBe(0);
+    it('replaces plan, planTags, and planRationale based on the picker result', () => {
+      const next = appReducer(initialAppState, action);
+      expect(next.planTags.slug).not.toBe(initialAppState.planTags.slug);
+      expect(next.plan).toBe(findTaggedBySlug(next.planTags.slug)?.plan);
+      expect(next.planRationale.length).toBeGreaterThan(0);
+    });
+
+    it('excludes the current plan from re-selection', () => {
+      const next = appReducer(initialAppState, action);
+      const again = appReducer(next, action);
+      expect(again.planTags.slug).not.toBe(next.planTags.slug);
+    });
   });
 
   it('ADD_UPLOADED_WORKOUT appends an imported workout with expected fields', () => {
