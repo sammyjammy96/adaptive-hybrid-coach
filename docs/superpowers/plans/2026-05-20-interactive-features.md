@@ -16,7 +16,7 @@
 
 **Last updated:** 2026-05-20
 
-Tasks 1–4 are complete on `master`. Tasks 5–11 remain. The reducer, persistence layer, and App.tsx wiring are all in place — what's left is wiring each UI button to its action.
+All tasks complete. Every prototype button is now wired to a real reducer action backed by localStorage. `npm run verify` passes (43 tests, secret scan clean, build green) and the GitHub Pages build emits relative asset paths.
 
 | # | Task | Status | Commits |
 |---|------|--------|---------|
@@ -24,15 +24,15 @@ Tasks 1–4 are complete on `master`. Tasks 5–11 remain. The reducer, persiste
 | 2 | Reducer (action vocabulary) | ✅ Done | `d28ca74`, `2a9910b` |
 | 3 | Persistence layer | ✅ Done | `bb35b08`, `073f684` |
 | 4 | Wire App.tsx to reducer + persistence | ✅ Done | `11a58d1` |
-| 5 | Approve / Needs review buttons | ⬜ Pending | — |
-| 6 | Apply easy version + Restore link | ⬜ Pending | — |
-| 7 | Regenerate week button | ⬜ Pending | — |
-| 8 | Upload screenshot | ⬜ Pending | — |
-| 9 | Save log (form + recent logs panel) | ⬜ Pending | — |
-| 10 | Reset prototype data | ⬜ Pending | — |
-| 11 | Final verification | ⬜ Pending | — |
+| 5 | Approve / Needs review buttons | ✅ Done | `c115670` |
+| 6 | Apply easy version + Restore link | ✅ Done | `1f55d87` |
+| 7 | Regenerate week button | ✅ Done | `ec3c5a4` |
+| 8 | Upload screenshot | ✅ Done | `c348bb9` |
+| 9 | Save log (form + recent logs panel) | ✅ Done | `e9980fc` |
+| 10 | Reset prototype data | ✅ Done | `fb318d3` |
+| 11 | Final verification | ✅ Done | (no code changes) |
 
-**To resume:** read [the spec](../specs/2026-05-20-interactive-features-design.md), then start at **Task 5** below. Each task has full code blocks and exact commands — the implementer needs no other context. The reviewer feedback from Tasks 1–4 surfaced some minor improvements not in the original plan (the `applyEasier` reference-stability guard, the `isValidShape` persistence sanity check, the `_exhaustive` `throw`, exported persistence key constants) — those are already in the codebase, so subsequent tasks build on them without needing replication.
+Note from execution: the Task 9 test in the original plan asserted `getByText(/felt strong|crossfit class/i)`, which fails because `CrossFit class` also appears as an `<option>` in the session-select dropdown. The implemented test instead scopes the assertion to the Recent logs region (`getByRole('region', { name: /recent logs/i })`) and looks specifically for the notes value.
 
 ---
 
