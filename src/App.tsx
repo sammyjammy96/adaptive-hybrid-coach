@@ -63,7 +63,7 @@ export default function App() {
           workouts={state.workouts}
           onApprove={(id) => dispatch({ type: 'APPROVE_WORKOUT', id })}
           onReject={(id) => dispatch({ type: 'REJECT_WORKOUT', id })}
-          onUpload={(fileName) => dispatch({ type: 'ADD_UPLOADED_WORKOUT', fileName })}
+          onUpload={(fileName, parsed) => dispatch({ type: 'ADD_UPLOADED_WORKOUT', fileName, parsed })}
         />
       ) : null}
       {state.activeScreen === 'log' ? (
