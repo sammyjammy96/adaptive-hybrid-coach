@@ -42,6 +42,8 @@ export default function App() {
       {state.activeScreen === 'plan' ? (
         <PlanScreen
           plan={protectedPlan}
+          variantIndex={state.planVariantIndex}
+          onRegenerateWeek={() => dispatch({ type: 'REGENERATE_WEEK' })}
           onRestore={(sessionId) => dispatch({ type: 'RESTORE_SESSION', sessionId })}
         />
       ) : null}

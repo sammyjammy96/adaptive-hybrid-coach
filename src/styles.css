@@ -517,3 +517,27 @@ button {
   filter: grayscale(0.4);
   opacity: 0.55;
 }
+
+.plan-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.variant-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: #aab5c5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 900px) {
+  .plan-header-actions {
+    justify-content: flex-start;
+  }
+}
